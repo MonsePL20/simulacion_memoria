@@ -28,13 +28,13 @@ class BotonesAccion extends StatelessWidget {
               controller: nombreCtrl,
               decoration: const InputDecoration(labelText: "Nombre del Proceso"),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 10),// Espacio entre campos
             TextField(
               controller: tamanoCtrl,
               decoration: const InputDecoration(labelText: "Tamaño (KB)"),
               keyboardType: TextInputType.number,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 10),// Espacio entre campos
             TextField(
               controller: llegadaCtrl,
               decoration: const InputDecoration(labelText: "Tiempo de Llegada"),
@@ -86,7 +86,7 @@ class BotonesAccion extends StatelessWidget {
             const SizedBox(height: 10),
             const Text(
               "¿Está seguro de eliminar este proceso?",
-              style: TextStyle(color: Colors.red, fontSize: 12),
+              style: TextStyle(color: Colors.red, fontSize: 12),// Advertencia
             ),
           ],
         ),
@@ -131,11 +131,11 @@ class BotonesAccion extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.green,
             foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+            padding: const EdgeInsets.symmetric(horizontal: 150, vertical: 75),// Tamaño grande
           ),
         ),
         
-        const SizedBox(height: 30),
+        const SizedBox(height: 50),// Espacio entre botones
         
         // 🔹 Botón SALIDA (Eliminar con confirmación)
         ElevatedButton.icon(
@@ -145,7 +145,7 @@ class BotonesAccion extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.red,
             foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+            padding: const EdgeInsets.symmetric(horizontal: 150, vertical: 75),// Tamaño grande
           ),
         ),
       ],

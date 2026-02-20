@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'TablaProcesosApp.dart';
 import 'Botones.dart';
-//#######################################################
-import 'PilaProcesos.dart'; // 📌 Nuevo archivo
-//#######################################################
+import 'PilaProcesos.dart';
 
 void main() {
   runApp(const MainApp());
@@ -35,19 +33,33 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
 
   // 📌 Método para agregar proceso
   void agregarProceso(String nombre, String tamano, String llegada) {
-//###############################################
     int nuevoTamano = int.tryParse(tamano) ?? 0;
     
     // Calcular ocupación actual
     int ocupado = procesos.fold(0, (sum, p) => sum + (int.tryParse(p['tamano'].toString()) ?? 0));
 
+    // 📌 Si no cabe en memoria, guardar en tabla pero NO en visualización
     if (ocupado + nuevoTamano > 100) {
+      setState(() {
+        procesos.add({
+          "nombre": nombre,
+          "tamano": tamano,
+          "llegada": llegada,
+          "salida": "-",
+          "atencion": "-",
+          "espera": "-"
+        });
+      });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Memoria llena!!")),
+        const SnackBar(
+          content: Text("Proceso en tabla (memoria llena)"),
+          backgroundColor: Colors.orange,
+        ),
       );
       return;
     }
-//###############################################
+
+    // 📌 Si cabe, agregar normalmente
     setState(() {
       procesos.add({
         "nombre": nombre,
@@ -95,13 +107,13 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
               onEliminar: eliminarProceso,
             ),
           ),
-//#######################################################
+
           // 🔹 CENTRO → MEMORIA
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20),
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
             child: VisualMemoria(procesos: procesos),
           ),
-//#######################################################
+
           // 🔹 DERECHA → TABLA
           Expanded(
             flex: 3,
