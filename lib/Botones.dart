@@ -1,73 +1,69 @@
 import 'package:flutter/material.dart';
 
 class BotonesAccion extends StatelessWidget {
-  // Avisar que se agrega informacion
-  final Function(String nombre, String tamano, String llegada) alAgregar;
-  final Function(String nombre, String salida) alSalir;
+
+  final Function(String, String, String) alAgregar;
+  final Function(String) alEliminar;
 
   const BotonesAccion({
-    super.key, 
-    required this.alAgregar, 
-    required this.alSalir
+    super.key,
+    required this.alAgregar,
+    required this.alEliminar,
   });
 
-  // --- LLEGADA ---
-  void _mostrarDialogoLlegada(BuildContext context) {
+  // LLEGADA
+  void dialogoLlegada(BuildContext context) {
     final nombreCtrl = TextEditingController();
     final tamanoCtrl = TextEditingController();
     final llegadaCtrl = TextEditingController();
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Llegada'),
+      builder: (_) => AlertDialog(
+        title: const Text("Agregar Proceso"),
         content: Column(
-          mainAxisSize: MainAxisSize.min, // ventana pequeña
+          mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(controller: nombreCtrl, decoration: const InputDecoration(labelText: 'Nombre del Proceso: ')),
-            TextField(controller: tamanoCtrl, decoration: const InputDecoration(labelText: 'Tamaño: ')),
-            TextField(controller: llegadaCtrl, decoration: const InputDecoration(labelText: 'Tiempo de Llegada: '), keyboardType: TextInputType.number),
+            TextField(controller: nombreCtrl, decoration: const InputDecoration(labelText: "Nombre")),
+            TextField(controller: tamanoCtrl, decoration: const InputDecoration(labelText: "Tamaño")),
+            TextField(controller: llegadaCtrl, decoration: const InputDecoration(labelText: "Tiempo Llegada")),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancelar")),
           ElevatedButton(
             onPressed: () {
-              // Envia los datos a la función principal
+              if (nombreCtrl.text.isEmpty) return;
               alAgregar(nombreCtrl.text, tamanoCtrl.text, llegadaCtrl.text);
               Navigator.pop(context);
             },
-            child: const Text('Agregar'),
+            child: const Text("Guardar"),
           ),
         ],
       ),
     );
   }
 
-  // --- SALIDA ---
-  void _mostrarDialogoSalida(BuildContext context) {
+  // SALIDA
+  void dialogoSalida(BuildContext context) {
     final nombreCtrl = TextEditingController();
-    final salidaCtrl = TextEditingController();
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Salida'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,// ventana pequeña
-          children: [
-            TextField(controller: nombreCtrl, decoration: const InputDecoration(labelText: 'Nombre del Proceso: ')),
-            TextField(controller: salidaCtrl, decoration: const InputDecoration(labelText: 'Tiempo de Salida: '), keyboardType: TextInputType.number),
-          ],
+      builder: (_) => AlertDialog(
+        title: const Text("Eliminar Proceso"),
+        content: TextField(
+          controller: nombreCtrl,
+          decoration: const InputDecoration(labelText: "Nombre del Proceso"),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancelar")),
           ElevatedButton(
             onPressed: () {
-              alSalir(nombreCtrl.text, salidaCtrl.text);
+              alEliminar(nombreCtrl.text);
               Navigator.pop(context);
             },
-            child: const Text('Salida'),
+            child: const Text("Confirmar"),
           ),
         ],
       ),
@@ -79,18 +75,16 @@ class BotonesAccion extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // Boton de llegada
         ElevatedButton.icon(
-          onPressed: () => _mostrarDialogoLlegada(context),
-          icon: const Icon(Icons.download),
-          label: const Text('Llegada'),
+          onPressed: () => dialogoLlegada(context),
+          icon: const Icon(Icons.add),
+          label: const Text("Llegada"),
         ),
         const SizedBox(height: 20),
-        // Boton de salida
         ElevatedButton.icon(
-          onPressed: () => _mostrarDialogoSalida(context),
-          icon: const Icon(Icons.upload),
-          label: const Text('Salida'),
+          onPressed: () => dialogoSalida(context),
+          icon: const Icon(Icons.delete),
+          label: const Text("Salida"),
         ),
       ],
     );

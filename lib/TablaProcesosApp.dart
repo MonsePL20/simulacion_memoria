@@ -1,83 +1,124 @@
 import 'package:flutter/material.dart';
+import 'Botones.dart';
 
-void main() => runApp(const TablaProcesosApp());
-
-class TablaProcesosApp extends StatelessWidget {
-  const TablaProcesosApp({super.key});
+class TablaProcesosLayout extends StatefulWidget {
+  const TablaProcesosLayout({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: TablaProcesosScreen(),
-    );
-  }
+  State<TablaProcesosLayout> createState() => _TablaProcesosLayoutState();
 }
 
-class TablaProcesosScreen extends StatelessWidget {
-  const TablaProcesosScreen({super.key});
+class _TablaProcesosLayoutState extends State<TablaProcesosLayout> {
+
+  List<Map<String, String>> procesos = [];
+
+  // AGREGAR
+  void agregarProceso(String nombre, String tamano, String llegada) {
+    setState(() {
+      procesos.add({
+        "nombre": nombre,
+        "tamano": tamano,
+        "llegada": llegada,
+        "salida": "-",
+        "atencion": "-",
+        "espera": "-"
+      });
+    });
+  }
+
+  // ELIMINAR CON VALIDACIÓN
+  void eliminarProceso(String nombre) {
+    final existe = procesos.any((p) => p["nombre"] == nombre);
+
+    if (!existe) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Proceso no encontrado")),
+      );
+      return;
+    }
+
+    setState(() {
+      procesos.removeWhere((p) => p["nombre"] == nombre);
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Proceso eliminado correctamente")),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 176, 194, 197), // 🔵 Color de fondo
-      appBar: AppBar(
-        title: const Text('Simulación de Memoria - Tabla de Procesos'),
-        backgroundColor: Colors.blueGrey,
-      ),
-      body: Row(
-        children: [
-          const Spacer(), // Empuja la tabla hacia la derecha
+    return Row(
+      children: [
 
-          Padding(
-            padding: const EdgeInsets.all(20.0),// Espacio alrededor de la tabla
+        const SizedBox(width: 40),
+
+        // 🔹 BOTONES IZQUIERDA
+        BotonesAccion(
+          alAgregar: agregarProceso,
+          alEliminar: eliminarProceso,
+        ),
+
+        const SizedBox(width: 40),
+
+        // 🔹 TABLA DERECHA
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
             child: Container(
-              color: Colors.white, // ⚪ Fondo blanco de la tabla
+              color: Colors.white,
               padding: const EdgeInsets.all(16),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: DataTable(
-                  border: TableBorder.all(),
-                  columns: const [
-                    DataColumn(label: Text('Nombre de Proceso')),
-                    DataColumn(label: Text('Tamaño')),
-                    DataColumn(label: Text('Tiempo de Llegada')),
-                    DataColumn(label: Text('Tiempo de Salida')),
-                    DataColumn(label: Text('Tiempo de Atención')),
-                    DataColumn(label: Text('Tiempo de Espera')),
-                  ],
-                  rows: const [
-                    DataRow(cells: [
-                      DataCell(Text('P1')),
-                      DataCell(Text('120 KB')),
-                      DataCell(Text('0')),
-                      DataCell(Text('5')),
-                      DataCell(Text('5')),
-                      DataCell(Text('0')),
-                    ]),
-                    DataRow(cells: [
-                      DataCell(Text('P2')),
-                      DataCell(Text('200 KB')),
-                      DataCell(Text('2')),
-                      DataCell(Text('8')),
-                      DataCell(Text('6')),
-                      DataCell(Text('2')),
-                    ]),
-                    DataRow(cells: [
-                      DataCell(Text('P3')),
-                      DataCell(Text('150 KB')),
-                      DataCell(Text('4')),
-                      DataCell(Text('10')),
-                      DataCell(Text('6')),
-                      DataCell(Text('3')),
-                    ]),
-                  ],
-                ),
+              child: Column(
+                children: [
+
+                  // TITULO
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    color: Colors.blueGrey[200],
+                    child: const Center(
+                      child: Text(
+                        "TABLA DE PROCESOS",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: DataTable(
+                      border: TableBorder.all(),
+                      columns: const [
+                        DataColumn(label: Text("Nombre")),
+                        DataColumn(label: Text("Tamaño")),
+                        DataColumn(label: Text("Llegada")),
+                        DataColumn(label: Text("Salida")),
+                        DataColumn(label: Text("Atención")),
+                        DataColumn(label: Text("Espera")),
+                      ],
+                      rows: procesos.map((p) {
+                        return DataRow(cells: [
+                          DataCell(Text(p["nombre"]!)),
+                          DataCell(Text(p["tamano"]!)),
+                          DataCell(Text(p["llegada"]!)),
+                          DataCell(Text(p["salida"]!)),
+                          DataCell(Text(p["atencion"]!)),
+                          DataCell(Text(p["espera"]!)),
+                        ]);
+                      }).toList(),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
