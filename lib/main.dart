@@ -26,18 +26,35 @@ class PantallaPrincipal extends StatefulWidget {
 }
 
 class _PantallaPrincipalState extends State<PantallaPrincipal> {
-  // 📌 Lista que almacena los procesos
+  
+  // 📌 Lista única y centralizada de procesos
   final List<Map<String, dynamic>> procesos = [];
 
   // 📌 Método para agregar proceso
-  void agregarProceso(Map<String, dynamic> proceso) {
+  void agregarProceso(String nombre, String tamano, String llegada) {
     setState(() {
-      procesos.add(proceso);
+      procesos.add({
+        "nombre": nombre,
+        "tamano": tamano,
+        "llegada": llegada,
+        "salida": "-",
+        "atencion": "-",
+        "espera": "-"
+      });
     });
   }
 
   // 📌 Método para eliminar proceso
   void eliminarProceso(String nombre) {
+    final existe = procesos.any((p) => p['nombre'] == nombre);
+    
+    if (!existe) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Proceso no encontrado")),
+      );
+      return;
+    }
+
     setState(() {
       procesos.removeWhere((p) => p['nombre'] == nombre);
     });
@@ -53,10 +70,11 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
       ),
       body: Row(
         children: [
+          
           // 🔹 IZQUIERDA → BOTONES
           Expanded(
             flex: 2,
-            child: Botones(// PASAMOS LOS MÉTODOS DE AGREGAR Y ELIMINAR
+            child: BotonesAccion(
               onAgregar: agregarProceso,
               onEliminar: eliminarProceso,
             ),
@@ -65,7 +83,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
           // 🔹 DERECHA → TABLA
           Expanded(
             flex: 3,
-            child: TablaProcesosApp(// PASAMOS LA LISTA DE PROCESOS
+            child: TablaProceso(
               procesos: procesos,
             ),
           ),
