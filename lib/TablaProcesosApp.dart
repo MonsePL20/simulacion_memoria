@@ -94,7 +94,7 @@ class TablaProceso extends StatelessWidget {
                                 DataCell(
                                   SizedBox(
                                     width: 60,
-                                    child: Text("${p["tamano"]} KB", textAlign: TextAlign.center),
+                                    child: Text("${p["tamano"]} MB", textAlign: TextAlign.center),
                                   ),
                                 ),
                                 DataCell(
