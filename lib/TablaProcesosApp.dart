@@ -30,7 +30,7 @@ class TablaProcesosScreen extends StatelessWidget {
           const Spacer(), // Empuja la tabla hacia la derecha
 
           Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(20.0),// Espacio alrededor de la tabla
             child: Container(
               color: Colors.white, // ⚪ Fondo blanco de la tabla
               padding: const EdgeInsets.all(16),
