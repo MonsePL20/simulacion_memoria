@@ -20,9 +20,9 @@ class TablaProcesosScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blueGrey[200], // 🔵 Color de fondo
+      backgroundColor: const Color.fromARGB(255, 176, 194, 197), // 🔵 Color de fondo
       appBar: AppBar(
-        title: const Text('Tabla de Procesos'),
+        title: const Text('Simulación de Memoria - Tabla de Procesos'),
         backgroundColor: Colors.blueGrey,
       ),
       body: Row(
