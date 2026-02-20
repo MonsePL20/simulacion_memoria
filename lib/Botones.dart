@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
 class BotonesAccion extends StatelessWidget {
-
   final Function(String, String, String) onAgregar;
-  final Function(String) onEliminar;
+  final Function(String, String) onEliminar;
 
   const BotonesAccion({
     super.key,
@@ -28,17 +27,16 @@ class BotonesAccion extends StatelessWidget {
               controller: nombreCtrl,
               decoration: const InputDecoration(labelText: "Nombre del Proceso"),
             ),
-            const SizedBox(height: 10),// Espacio entre campos
+            const SizedBox(height: 10),
             TextField(
               controller: tamanoCtrl,
-              decoration: const InputDecoration(labelText: "Tamaño (MB)"),
+              decoration: const InputDecoration(labelText: "Tamaño (KB)"),
               keyboardType: TextInputType.number,
             ),
-            const SizedBox(height: 10),// Espacio entre campos
+            const SizedBox(height: 10),
             TextField(
               controller: llegadaCtrl,
-              decoration: const InputDecoration(labelText: "Tiempo de Llegada"),
-              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: "Tiempo de Llegada (HH:MM)"),
             ),
           ],
         ),
@@ -68,9 +66,10 @@ class BotonesAccion extends StatelessWidget {
     );
   }
 
-  // 📌 Dialogo para ELIMINAR proceso (CON CONFIRMACIÓN)
+  // 📌 Dialogo para ELIMINAR proceso (CON VALIDACIÓN)
   void dialogoEliminar(BuildContext context) {
     final nombreCtrl = TextEditingController();
+    final salidaCtrl = TextEditingController();
 
     showDialog(
       context: context,
@@ -84,9 +83,14 @@ class BotonesAccion extends StatelessWidget {
               decoration: const InputDecoration(labelText: "Nombre del Proceso"),
             ),
             const SizedBox(height: 10),
+            TextField(
+              controller: salidaCtrl,
+              decoration: const InputDecoration(labelText: "Tiempo de Salida (HH:MM)"),
+            ),
+            const SizedBox(height: 10),
             const Text(
-              "¿Está seguro de eliminar este proceso?",
-              style: TextStyle(color: Colors.red, fontSize: 12),// Advertencia
+              "Ingrese el nombre y tiempo de salida del proceso a eliminar",
+              style: TextStyle(color: Colors.grey, fontSize: 12),
             ),
           ],
         ),
@@ -98,17 +102,16 @@ class BotonesAccion extends StatelessWidget {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
-              if (nombreCtrl.text.isEmpty) {
+              if (nombreCtrl.text.isEmpty || salidaCtrl.text.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Ingrese el nombre")),
+                  const SnackBar(content: Text("Complete todos los campos")),
                 );
                 return;
               }
-              onEliminar(nombreCtrl.text);
+              
+              // 📌 Llamar a eliminar (la validación de existencia está en main)
+              onEliminar(nombreCtrl.text, salidaCtrl.text);
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Proceso eliminado correctamente")),
-              );
             },
             child: const Text("Confirmar"),
           ),
@@ -131,11 +134,11 @@ class BotonesAccion extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.green,
             foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 150, vertical: 75),// Tamaño grande
+            padding: const EdgeInsets.symmetric(horizontal: 150, vertical: 75),
           ),
         ),
         
-        const SizedBox(height: 50),// Espacio entre botones
+        const SizedBox(height: 50),
         
         // 🔹 Botón SALIDA (Eliminar con confirmación)
         ElevatedButton.icon(
@@ -145,7 +148,7 @@ class BotonesAccion extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.red,
             foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 150, vertical: 75),// Tamaño grande
+            padding: const EdgeInsets.symmetric(horizontal: 150, vertical: 75),
           ),
         ),
       ],

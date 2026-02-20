@@ -129,20 +129,35 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     });
   }
 
-  // 📌 Método para eliminar proceso
-  void eliminarProceso(String nombre) {
-    final existe = procesos.any((p) => p['nombre'] == nombre);
+  // 📌 Método para eliminar proceso (CON VALIDACIÓN)
+  void eliminarProceso(String nombre, String salida) {
+    // 📌 Buscar proceso por nombre Y tiempo de salida
+    final existe = procesos.any((p) => 
+      p['nombre'] == nombre && p['salida'] == salida
+    );
     
     if (!existe) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Proceso no encontrado")),
+        const SnackBar(
+          content: Text("Proceso no encontrado - Verifique nombre y tiempo de salida"),
+          backgroundColor: Colors.red,
+        ),
       );
       return;
     }
 
     setState(() {
-      procesos.removeWhere((p) => p['nombre'] == nombre);
+      procesos.removeWhere((p) => 
+        p['nombre'] == nombre && p['salida'] == salida
+      );
     });
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Proceso '$nombre' eliminado correctamente"),
+        backgroundColor: Colors.green,
+      ),
+    );
   }
 
   @override
