@@ -19,7 +19,7 @@ class TablaProceso extends StatelessWidget {
         child: Column(
           children: [
 
-            // 🔹 TITULO
+            // TITULO
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(12),
@@ -35,18 +35,18 @@ class TablaProceso extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 10),// Espacio entre título y tabla
+            const SizedBox(height: 10),
 
-            // 🔹 TABLA CON SCROLL
+            // TABLA CON SCROLL
             Expanded(
               child: SingleChildScrollView(
                 scrollDirection: Axis.vertical,
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: DataTable(
-                    headingRowHeight: 50,// Altura de encabezado
-                    dataRowMinHeight: 40,// Altura mínima de filas
-                    dataRowMaxHeight: 50,// Altura máxima de filas
+                    headingRowHeight: 50,
+                    dataRowMinHeight: 40,
+                    dataRowMaxHeight: 50,
                     columnSpacing: 20,
                     horizontalMargin: 15,
                     border: TableBorder.all(color: Colors.grey),
@@ -62,13 +62,13 @@ class TablaProceso extends StatelessWidget {
                         label: Text("Tiempo Llegada", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
                       ),
                       DataColumn(
-                        label: Text("Tiempo Salida", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
-                      ),
-                      DataColumn(
-                        label: Text("Tiempo Atencion", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
-                      ),
-                      DataColumn(
                         label: Text("Tiempo Espera", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+                      ),
+                      DataColumn(
+                        label: Text("Tiempo Atención", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+                      ),
+                      DataColumn(
+                        label: Text("Tiempo Salida", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
                       ),
                     ],
                     rows: procesos.isEmpty
@@ -88,37 +88,37 @@ class TablaProceso extends StatelessWidget {
                                 DataCell(
                                   SizedBox(
                                     width: 80,
-                                    child: Text(p["nombre"] ?? "-", overflow: TextOverflow.ellipsis),// Evitar texto largo
+                                    child: Text(p["nombre"] ?? "-", overflow: TextOverflow.ellipsis),
                                   ),
                                 ),
                                 DataCell(
                                   SizedBox(
                                     width: 60,
-                                    child: Text(p["tamano"] ?? "-", textAlign: TextAlign.center),// Centrar texto
+                                    child: Text("${p["tamano"]} KB", textAlign: TextAlign.center),
                                   ),
                                 ),
                                 DataCell(
                                   SizedBox(
-                                    width: 60,
+                                    width: 90,
                                     child: Text(p["llegada"] ?? "-", textAlign: TextAlign.center),
                                   ),
                                 ),
                                 DataCell(
                                   SizedBox(
-                                    width: 60,
-                                    child: Text(p["salida"] ?? "-", textAlign: TextAlign.center),
+                                    width: 90,
+                                    child: Text(p["espera"] ?? "-", textAlign: TextAlign.center),
                                   ),
                                 ),
                                 DataCell(
                                   SizedBox(
-                                    width: 60,
+                                    width: 90,
                                     child: Text(p["atencion"] ?? "-", textAlign: TextAlign.center),
                                   ),
                                 ),
                                 DataCell(
                                   SizedBox(
-                                    width: 60,
-                                    child: Text(p["espera"] ?? "-", textAlign: TextAlign.center),
+                                    width: 90,
+                                    child: Text(p["salida"] ?? "-", textAlign: TextAlign.center),
                                   ),
                                 ),
                               ],

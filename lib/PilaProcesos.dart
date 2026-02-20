@@ -12,7 +12,7 @@ class VisualMemoria extends StatefulWidget {
 class _VisualMemoriaState extends State<VisualMemoria> {
   
   final List<Color> _palette = [
-    Colors.black,
+    const Color.fromARGB(255, 66, 63, 63),
     Colors.deepPurpleAccent,
     const Color.fromARGB(255, 174, 255, 82),
     Colors.blue,
@@ -65,7 +65,7 @@ class _VisualMemoriaState extends State<VisualMemoria> {
     return Column(
       children: [
         
-        //  CONTADOR DE MEMORIA (NUEVO)
+        //  CONTADOR DE MEMORIA LIBRE
         Container(
           width: 400,
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
@@ -90,7 +90,8 @@ class _VisualMemoriaState extends State<VisualMemoria> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                 decoration: BoxDecoration(
-                  color: memoriaLibre > 30 ? Colors.green : (memoriaLibre > 10 ? Colors.orange : Colors.red),
+                  color: memoriaLibre > 30 ? Colors.green : (memoriaLibre > 10 ? Colors.green : Colors.green),
+                  //color: memoriaLibre > 30 ? Colors.green : (memoriaLibre > 10 ? Colors.orange : Colors.red),
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: Text(

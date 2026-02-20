@@ -11,7 +11,7 @@ class BotonesAccion extends StatelessWidget {
     required this.onEliminar,
   });
 
-  // 📌 Dialogo para AGREGAR proceso
+  // Dialogo para AGREGAR proceso
   void dialogoAgregar(BuildContext context) {
     final nombreCtrl = TextEditingController();
     final tamanoCtrl = TextEditingController();
@@ -31,7 +31,7 @@ class BotonesAccion extends StatelessWidget {
             const SizedBox(height: 10),// Espacio entre campos
             TextField(
               controller: tamanoCtrl,
-              decoration: const InputDecoration(labelText: "Tamaño (KB)"),
+              decoration: const InputDecoration(labelText: "Tamaño (MB)"),
               keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 10),// Espacio entre campos
