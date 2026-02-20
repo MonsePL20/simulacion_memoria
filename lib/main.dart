@@ -29,13 +29,13 @@ class PantallaPrincipal extends StatefulWidget {
 
 class _PantallaPrincipalState extends State<PantallaPrincipal> {
   
-  // 📌 Lista única y centralizada de procesos
+  //Lista única y centralizada de procesos
   final List<Map<String, dynamic>> procesos = [];
   
-  // 📌 Random para los cálculos
+  // Random para los cálculos
   final Random _random = Random();
 
-  // 📌 Convertir HH:MM a minutos totales
+  //Convertir HH:MM a minutos totales
   int _horaAMinutos(String horaStr) {
     try {
       if (!horaStr.contains(':')) return 0;
@@ -48,14 +48,14 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     }
   }
 
-  // 📌 Convertir minutos totales a HH:MM
+  // Convertir minutos totales a HH:MM
   String _minutosAHora(int minutosTotales) {
     int horas = minutosTotales ~/ 60;
     int minutos = minutosTotales % 60;
     return "$horas:${minutos.toString().padLeft(2, '0')}";
   }
 
-  // 📌 Función para calcular tiempo de atención (10% probabilidad de 1-10 min)
+  // Función para calcular tiempo de atención (10% probabilidad de 1-10 min)
   int _calcularTiempoAtencion() {
     int probabilidad = _random.nextInt(100); // 0-99
     if (probabilidad < 10) { // 10% de probabilidad
@@ -64,39 +64,39 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     return 0;
   }
 
-  // 📌 Función para calcular tiempo de salida (0-10 minutos)
+  //Función para calcular tiempo de salida (0-10 minutos)
   int _calcularTiempoSalida() {
     return _random.nextInt(11); // 0-10 minutos
   }
 
-  // 📌 Método para agregar proceso
+  //Método para agregar proceso
   void agregarProceso(String nombre, String tamano, String llegada) {
     int nuevoTamano = int.tryParse(tamano) ?? 0;
     
-    // 📌 Convertir hora de llegada a minutos
+    //Convertir hora de llegada a minutos
     int tiempoLlegadaMin = _horaAMinutos(llegada);
     
-    // 📌 Calcular tiempo de atención (10% probabilidad de 1-10 min)
+    // Calcular tiempo de atención (10% probabilidad de 1-10 min)
     int tiempoAtencionAdicional = _calcularTiempoAtencion();
     int tiempoAtencionMin = tiempoLlegadaMin + tiempoAtencionAdicional;
     
-    // 📌 Calcular tiempo de salida (0-10 min después de atención)
+    // Calcular tiempo de salida (0-10 min después de atención)
     int tiempoSalidaAdicional = _calcularTiempoSalida();
     int tiempoSalidaMin = tiempoAtencionMin + tiempoSalidaAdicional;
     
-    // 📌 Calcular tiempo de espera (diferencia en minutos)
+    //Calcular tiempo de espera (diferencia en minutos)
     int tiempoEsperaMin = tiempoAtencionMin - tiempoLlegadaMin;
     
-    // 📌 Convertir a formato HH:MM
+    //Convertir a formato HH:MM
     String horaLlegada = _minutosAHora(tiempoLlegadaMin);
     String horaAtencion = _minutosAHora(tiempoAtencionMin);
     String horaSalida = _minutosAHora(tiempoSalidaMin);
-    String tiempoEsperaStr = "$tiempoEsperaMin min";
+    String tiempoEsperaStr = "$tiempoEsperaMin min";// Mostrar en minutos para claridad
     
     // Calcular ocupación actual
     int ocupado = procesos.fold(0, (sum, p) => sum + (int.tryParse(p['tamano'].toString()) ?? 0));
 
-    // 📌 Crear proceso con todos los datos
+    // Crear proceso con todos los datos
     Map<String, dynamic> nuevoProceso = {
       "nombre": nombre,
       "tamano": tamano,
@@ -106,7 +106,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
       "espera": tiempoEsperaStr,
     };
 
-    // 📌 Si no cabe en memoria, guardar en tabla (proceso en espera)
+    // Si no cabe en memoria, guardar en tabla (proceso en espera)
     if (ocupado + nuevoTamano > 100) {
       setState(() {
         procesos.add(nuevoProceso);
@@ -123,16 +123,16 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
       return;
     }
 
-    // 📌 Si cabe, agregar normalmente
+    // Si cabe, agregar normalmente
     setState(() {
       procesos.add(nuevoProceso);
     });
   }
 
-  // 📌 Método para eliminar proceso (CON VALIDACIÓN)
+  // Método para eliminar proceso (CON VALIDACIÓN)
   void eliminarProceso(String nombre, String salida) {
-    // 📌 Buscar proceso por nombre Y tiempo de salida
-    final existe = procesos.any((p) => 
+    // Buscar proceso por nombre Y tiempo de salida
+    final existe = procesos.any((p) =>
       p['nombre'] == nombre && p['salida'] == salida
     );
     
@@ -147,7 +147,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     }
 
     setState(() {
-      procesos.removeWhere((p) => 
+      procesos.removeWhere((p) =>
         p['nombre'] == nombre && p['salida'] == salida
       );
     });
@@ -171,7 +171,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
       body: Row(
         children: [
           
-          // 🔹 IZQUIERDA → BOTONES
+          //IZQUIERDA → BOTONES
           Expanded(
             flex: 2,
             child: BotonesAccion(
@@ -180,13 +180,13 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
             ),
           ),
 
-          // 🔹 CENTRO → MEMORIA
+          // CENTRO → MEMORIA
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
             child: VisualMemoria(procesos: procesos),
           ),
 
-          // 🔹 DERECHA → TABLA
+          // DERECHA → TABLA
           Expanded(
             flex: 3,
             child: TablaProceso(

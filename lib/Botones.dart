@@ -66,7 +66,7 @@ class BotonesAccion extends StatelessWidget {
     );
   }
 
-  // 📌 Dialogo para ELIMINAR proceso (CON VALIDACIÓN)
+  //Dialogo para ELIMINAR proceso (CON VALIDACIÓN)
   void dialogoEliminar(BuildContext context) {
     final nombreCtrl = TextEditingController();
     final salidaCtrl = TextEditingController();
@@ -109,7 +109,7 @@ class BotonesAccion extends StatelessWidget {
                 return;
               }
               
-              // 📌 Llamar a eliminar (la validación de existencia está en main)
+              // Llamar a eliminar (la validación de existencia está en main)
               onEliminar(nombreCtrl.text, salidaCtrl.text);
               Navigator.pop(context);
             },
@@ -126,7 +126,7 @@ class BotonesAccion extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         
-        // 🔹 Botón LLEGADA (Agregar)
+        // Botón LLEGADA (Agregar)
         ElevatedButton.icon(
           onPressed: () => dialogoAgregar(context),
           icon: const Icon(Icons.add),
@@ -140,7 +140,7 @@ class BotonesAccion extends StatelessWidget {
         
         const SizedBox(height: 50),
         
-        // 🔹 Botón SALIDA (Eliminar con confirmación)
+        // Botón SALIDA (Eliminar con confirmación)
         ElevatedButton.icon(
           onPressed: () => dialogoEliminar(context),
           icon: const Icon(Icons.delete),
