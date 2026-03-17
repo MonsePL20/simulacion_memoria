@@ -129,7 +129,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     });
   }
 
-  // Método para eliminar proceso (CON VALIDACIÓN)
+  // Método para eliminar proceso VALIDACION
   void eliminarProceso(String nombre, String salida) {
     // Buscar proceso por nombre Y tiempo de salida
     final existe = procesos.any((p) =>
@@ -171,7 +171,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
       body: Row(
         children: [
           
-          //IZQUIERDA → BOTONES
+          //IZQUIERDA BOTONES
           Expanded(
             flex: 2,
             child: BotonesAccion(
@@ -180,13 +180,13 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
             ),
           ),
 
-          // CENTRO → MEMORIA
+          // CENTRO MEMORIA
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
             child: VisualMemoria(procesos: procesos),
           ),
 
-          // DERECHA → TABLA
+          // DERECHA TABLA
           Expanded(
             flex: 3,
             child: TablaProceso(
