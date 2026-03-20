@@ -10,7 +10,7 @@ class BotonesAccion extends StatelessWidget {
     required this.onEliminar,
   });
 
-  // Dialogo para AGREGAR proceso
+  // Dialogo para AGREGAR proceso 
   void dialogoAgregar(BuildContext context) {
     final nombreCtrl = TextEditingController();
     final tamanoCtrl = TextEditingController();
@@ -20,6 +20,7 @@ class BotonesAccion extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("Agregar Proceso"),
+        //hace que el dialogo no ocupe toda la pantalla
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -28,7 +29,8 @@ class BotonesAccion extends StatelessWidget {
               decoration: const InputDecoration(labelText: "Nombre del Proceso"),
             ),
             const SizedBox(height: 10),
-            TextField(
+            TextField( 
+              //solo permite teclado numerico
               controller: tamanoCtrl,
               decoration: const InputDecoration(labelText: "Tamaño (MB)"),
               keyboardType: TextInputType.number,
@@ -47,6 +49,7 @@ class BotonesAccion extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
+              //evita guardar sin nombre
               if (nombreCtrl.text.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text("El nombre es obligatorio")),
@@ -102,6 +105,7 @@ class BotonesAccion extends StatelessWidget {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
+              //validacion que ambos campos esten llenos
               if (nombreCtrl.text.isEmpty || salidaCtrl.text.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text("Complete todos los campos")),
@@ -134,7 +138,7 @@ class BotonesAccion extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.green,
             foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 150, vertical: 75),
+            padding: const EdgeInsets.symmetric(horizontal: 150, vertical: 75), //aumenta el tamañano del boton
           ),
         ),
         

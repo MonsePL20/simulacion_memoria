@@ -27,15 +27,15 @@ class _VisualMemoriaState extends State<VisualMemoria> {
   //  Mapa de colores por nombre de proceso (PERSISTENTE)
   final Map<String, Color> _coloresAsignados = {};
   
-  //  Índice para asignar siguiente color disponible
+  //  Indice para asignar siguiente color disponible
   int _indiceColor = 0;
 
-  //  Obtener o asignar color a un proceso
+  //  Funcion para asignar color a un proceso
   Color _obtenerColor(String nombre) {
     if (_coloresAsignados.containsKey(nombre)) {
       return _coloresAsignados[nombre]!;
     }
-    
+    //tomar el siguiente color disponible
     Color nuevoColor = _palette[_indiceColor % _palette.length];
     _coloresAsignados[nombre] = nuevoColor;
     _indiceColor++;
@@ -50,16 +50,17 @@ class _VisualMemoriaState extends State<VisualMemoria> {
     // Calcular memoria ocupada (solo de procesos que caben)
     int memoriaOcupada = 0;
     final List<Map<String, dynamic>> procesosEnMemoria = [];
-    
+    //Procesos que si caben en memoria
     for (var p in widget.procesos) {
-      int tamano = int.tryParse(p['tamano'].toString()) ?? 0;
+      int tamano = int.tryParse(p['tamano'].toString()) ?? 0; //convierte el tamaño a entero
+      //agrega el proceso si hay espacio 
       if (memoriaOcupada + tamano <= memoriaTotal) {
         memoriaOcupada += tamano;
         procesosEnMemoria.add(p);
       }
     }
 
-    //  Memoria libre
+    //  Memoria libre o sobrante
     int memoriaLibre = memoriaTotal - memoriaOcupada;
 
     return Column(
@@ -107,66 +108,68 @@ class _VisualMemoriaState extends State<VisualMemoria> {
         ),
 
         //  Contenedor de la memoria
-        Container(
-          height: 750,
-          width: 400,
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.blueGrey, width: 2),
-            borderRadius: const BorderRadius.only(
-              bottomLeft: Radius.circular(12),
-              bottomRight: Radius.circular(12),
+        Expanded(
+            child: Container(
+            //height: 750,
+            width: 400,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.blueGrey, width: 2),
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(12),
+                bottomRight: Radius.circular(12),
+              ),
             ),
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Column(
-              children: [
-                
-                //  Bloques de procesos en memoria
-                ...procesosEnMemoria.asMap().entries.map((entry) {
-                  var proceso = entry.value;
-                  int flexValue = int.tryParse(proceso['tamano'].toString()) ?? 10;
-                  Color colorProceso = _obtenerColor(proceso['nombre'] ?? "?");
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Column(
+                children: [
+                  
+                  //  Bloques de procesos en memoria
+                  ...procesosEnMemoria.asMap().entries.map((entry) {
+                    var proceso = entry.value;
+                    int flexValue = int.tryParse(proceso['tamano'].toString()) ?? 10; //el tamaño crece proporcionalmente
+                    Color colorProceso = _obtenerColor(proceso['nombre'] ?? "?"); 
 
-                  return Expanded(
-                    flex: flexValue,
-                    child: Container(
-                      width: double.infinity,
-                      color: colorProceso,
-                      child: Center(
-                        child: Text(
-                          "${proceso['nombre']}\n${proceso['tamano']}MB",
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: 12,
+                    return Expanded(
+                      flex: flexValue, //simula la memoria real en proporcion
+                      child: Container(
+                        width: double.infinity,
+                        color: colorProceso,
+                        child: Center(
+                          child: Text(
+                            "${proceso['nombre']}\n${proceso['tamano']}MB",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+
+                  //  Memoria libre 
+                  if (memoriaLibre > 0)
+                    Expanded(
+                      flex: memoriaLibre, //representa el espacio vacio
+                      child: Container(
+                        color: Colors.grey[300],
+                        child: Center(
+                          child: Text(
+                            "Libre\n${memoriaLibre}MB",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black54,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       ),
                     ),
-                  );
-                }).toList(),
-
-                //  Memoria libre
-                if (memoriaLibre > 0)
-                  Expanded(
-                    flex: memoriaLibre,
-                    child: Container(
-                      color: Colors.grey[300],
-                      child: Center(
-                        child: Text(
-                          "Libre\n${memoriaLibre}MB",
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black54,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
