@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:simulacion_memoria/Botones.dart';
 
 class VisualMemoria extends StatefulWidget {
   final List<Map<String, dynamic>> procesos;
-
-  const VisualMemoria({super.key, required this.procesos});
+  final Opciones opcion;
+  const VisualMemoria({
+    super.key, 
+    required this.procesos,
+    required this.opcion,
+    });
 
   @override
   State<VisualMemoria> createState() => _VisualMemoriaState();
 }
 
 class _VisualMemoriaState extends State<VisualMemoria> {
+  List<Map<String , dynamic >> memoria = [];
+  final int memoriaTotal = 100;
   
   final List<Color> _palette = [
     const Color.fromARGB(255, 66, 63, 63),
@@ -23,156 +30,180 @@ class _VisualMemoriaState extends State<VisualMemoria> {
     Colors.teal,
     Colors.indigo,
   ];
-
-  //  Mapa de colores por nombre de proceso (PERSISTENTE)
-  final Map<String, Color> _coloresAsignados = {};
   
-  //  Indice para asignar siguiente color disponible
-  int _indiceColor = 0;
+  @override
+  void initState(){
+    super.initState();
+    //inicializacion con un solo bloque
+    memoria = [
+      {"nombre" : "Libre" , "tamano" : memoriaTotal, "libre" : true}
+    ];
+  }
 
-  //  Funcion para asignar color a un proceso
-  Color _obtenerColor(String nombre) {
-    if (_coloresAsignados.containsKey(nombre)) {
-      return _coloresAsignados[nombre]!;
+  //Lista de procesos cambia
+  @override
+  void didUpdateWidget (VisualMemoria oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _sincronizarMemoria();
+  }
+
+  void _sincronizarMemoria(){
+    //si hay procesos nuevos en widget se intentan meter
+    for (var p in widget.procesos){
+      bool yaEnMemoria = memoria.any((m) => m["nombre"] == p["nombre"]);
+      if (!yaEnMemoria){
+        int tam = int.tryParse(p["tamano"].toString()) ?? 0;
+
+        if (widget.opcion == Opciones.primerAjuste){
+          _primerAjuste(p["nombre"],tam);
+        }else{
+          _mejorAjuste(p["nombre"],tam);
+        }
+        //_asignarEspacio(p["nombre"],int.tryParse(p["tamano"].toString()) ?? 0);
+      }
     }
-    //tomar el siguiente color disponible
-    Color nuevoColor = _palette[_indiceColor % _palette.length];
-    _coloresAsignados[nombre] = nuevoColor;
-    _indiceColor++;
-    
-    return nuevoColor;
+    //si un proceso fue eliminado se libera de memoria
+    for (var bloque in memoria) {
+      if (!(bloque["libre"] ?? false)) {
+        bool sigueExistiendo = widget.procesos.any((p) => p["nombre"] == bloque["nombre"]);
+        if (!sigueExistiendo) {
+          setState(() {
+            bloque["libre"] = true;
+            bloque["nombre"] = "Libre";
+          });
+        }
+      }
+    }
+  }
+
+  void _primerAjuste(String nombre, int tamano) {
+  for (int i = 0; i < memoria.length; i++) {
+    if (memoria[i]["libre"] && memoria[i]["tamano"] >= tamano) {
+      int restante = memoria[i]["tamano"] - tamano;
+
+      setState(() {
+        memoria[i] = {"nombre": nombre, "tamano": tamano, "libre": false};
+
+        if (restante > 0) {
+          memoria.insert(i + 1, {
+            "nombre": "Libre",
+            "tamano": restante,
+            "libre": true
+          });
+        }
+      });
+      return;
+    }
+  }
+}
+
+void _mejorAjuste(String nombre, int tamano) {
+  int mejorIndex = -1;
+  int mejorTamano = 999999;
+
+  for (int i = 0; i < memoria.length; i++) {
+    if (memoria[i]["libre"] && memoria[i]["tamano"] >= tamano) {
+      
+      int espacio = memoria[i]["tamano"];
+
+      if (espacio < mejorTamano) {
+        mejorTamano = espacio;
+        mejorIndex = i;
+      }
+    }
+  }
+
+  if (mejorIndex != -1) {
+    int restante = memoria[mejorIndex]["tamano"] - tamano;
+
+    setState(() {
+      memoria[mejorIndex] = {
+        "nombre": nombre,
+        "tamano": tamano,
+        "libre": false
+      };
+
+      if (restante > 0) {
+        memoria.insert(mejorIndex + 1, {
+          "nombre": "Libre",
+          "tamano": restante,
+          "libre": true
+        });
+      }
+    });
+  }
+}
+
+  Color _obtenerColor(String nombre) {
+    int hash = nombre.hashCode;
+    return _palette[hash.abs() % _palette.length];
   }
 
   @override
   Widget build(BuildContext context) {
-    const int memoriaTotal = 100;
-  
-    // Calcular memoria ocupada (solo de procesos que caben)
-    int memoriaOcupada = 0;
-    final List<Map<String, dynamic>> procesosEnMemoria = [];
-    //Procesos que si caben en memoria
-    for (var p in widget.procesos) {
-      int tamano = int.tryParse(p['tamano'].toString()) ?? 0; //convierte el tamaño a entero
-      //agrega el proceso si hay espacio 
-      if (memoriaOcupada + tamano <= memoriaTotal) {
-        memoriaOcupada += tamano;
-        procesosEnMemoria.add(p);
-      }
-    }
-
-    //  Memoria libre o sobrante
-    int memoriaLibre = memoriaTotal - memoriaOcupada;
+    int memoriaLibre = memoria
+    .where((b) => b["libre"])
+    .fold(0, (sum, b) => sum + (b["tamano"] as int));
 
     return Column(
       children: [
-        
-        //  CONTADOR DE MEMORIA LIBRE
         Container(
           width: 400,
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
           decoration: BoxDecoration(
             color: Colors.blueGrey[800],
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(12),
-              topRight: Radius.circular(12),
-            ),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "MEMORIA",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
+              const Text("MEMORIA", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                decoration: BoxDecoration(
-                  color: memoriaLibre > 30 ? Colors.green : (memoriaLibre > 10 ? Colors.green : Colors.green),
-                  //color: memoriaLibre > 30 ? Colors.green : (memoriaLibre > 10 ? Colors.orange : Colors.red),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Text(
-                  "Libre: $memoriaLibre MB / $memoriaTotal MB",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                decoration: BoxDecoration(color: Colors.green, borderRadius: BorderRadius.circular(15)),
+                child: Text("Libre: $memoriaLibre MB / $memoriaTotal MB",
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
         ),
-
-        //  Contenedor de la memoria
         Expanded(
-            child: Container(
-            //height: 750,
+          child: Container(
             width: 400,
             decoration: BoxDecoration(
               border: Border.all(color: Colors.blueGrey, width: 2),
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(12),
-                bottomRight: Radius.circular(12),
-              ),
+              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(12)),
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: Column(
-                children: [
-                  
-                  //  Bloques de procesos en memoria
-                  ...procesosEnMemoria.asMap().entries.map((entry) {
-                    var proceso = entry.value;
-                    int flexValue = int.tryParse(proceso['tamano'].toString()) ?? 10; //el tamaño crece proporcionalmente
-                    Color colorProceso = _obtenerColor(proceso['nombre'] ?? "?"); 
-
-                    return Expanded(
-                      flex: flexValue, //simula la memoria real en proporcion
-                      child: Container(
-                        width: double.infinity,
-                        color: colorProceso,
-                        child: Center(
-                          child: Text(
-                            "${proceso['nombre']}\n${proceso['tamano']}MB",
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              fontSize: 12,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
+                children: memoria.map((bloque) {
+                  return Expanded(
+                    flex: bloque["tamano"],
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: bloque["libre"] ? Colors.grey[300] : _obtenerColor(bloque["nombre"]),
+                        border: Border.all(color: Colors.black12, width: 0.5),
                       ),
-                    );
-                  }).toList(),
-
-                  //  Memoria libre 
-                  if (memoriaLibre > 0)
-                    Expanded(
-                      flex: memoriaLibre, //representa el espacio vacio
-                      child: Container(
-                        color: Colors.grey[300],
-                        child: Center(
-                          child: Text(
-                            "Libre\n${memoriaLibre}MB",
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black54,
-                            ),
-                            textAlign: TextAlign.center,
+                      child: Center(
+                        child: Text(
+                          "${bloque["nombre"]}\n${bloque["tamano"]}MB",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: bloque["libre"] ? Colors.black54 : Colors.white,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
                     ),
-                ],
+                  );
+                }).toList(),
               ),
             ),
           ),
         ),
+    
       ],
     );
   }

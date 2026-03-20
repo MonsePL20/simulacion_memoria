@@ -22,7 +22,6 @@ class MainApp extends StatelessWidget {
 
 class PantallaPrincipal extends StatefulWidget {
   const PantallaPrincipal({super.key});
-
   @override
   State<PantallaPrincipal> createState() => _PantallaPrincipalState();
 }
@@ -68,6 +67,8 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
   int _calcularTiempoSalida() {
     return _random.nextInt(11); // 0-10 minutos
   }
+
+  Opciones _opcionSeleccionada = Opciones.primerAjuste;
 
   //Método para agregar proceso
   void agregarProceso(String nombre, String tamano, String llegada) {
@@ -121,12 +122,13 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
       );
       
       return;
-    }
-
-    // Si cabe, agregar normalmente
-    setState(() {
+    }  
+    
+    //Agrega el proceso
+     setState(() {
       procesos.add(nuevoProceso);
     });
+    
   }
 
   // Método para eliminar proceso VALIDACION
@@ -177,13 +179,19 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
             child: BotonesAccion(
               onAgregar: agregarProceso,
               onEliminar: eliminarProceso,
+              onCambioOpcion: (op){
+                setState(() {
+                  _opcionSeleccionada = op;
+                });
+              },
             ),
           ),
 
           // CENTRO MEMORIA
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-            child: VisualMemoria(procesos: procesos),
+            child: VisualMemoria(procesos: procesos,
+            opcion :_opcionSeleccionada),
           ),
 
           // DERECHA TABLA

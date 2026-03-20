@@ -1,15 +1,28 @@
 import 'package:flutter/material.dart';
 
-class BotonesAccion extends StatelessWidget {
+enum Opciones { primerAjuste , mejorAjuste }
+
+class BotonesAccion extends StatefulWidget {
   final Function(String, String, String) onAgregar;
   final Function(String, String) onEliminar;
+  final Function (Opciones) onCambioOpcion;
 
   const BotonesAccion({
     super.key,
     required this.onAgregar,
     required this.onEliminar,
+    required this.onCambioOpcion,
   });
 
+  @override
+  State<BotonesAccion> createState() =>_BotonesAccionState();
+
+}
+
+class _BotonesAccionState extends State<BotonesAccion> {
+   
+  Opciones? _seleccion = Opciones.primerAjuste;
+  
   // Dialogo para AGREGAR proceso 
   void dialogoAgregar(BuildContext context) {
     final nombreCtrl = TextEditingController();
@@ -56,7 +69,7 @@ class BotonesAccion extends StatelessWidget {
                 );
                 return;
               }
-              onAgregar(nombreCtrl.text, tamanoCtrl.text, llegadaCtrl.text);
+              widget.onAgregar(nombreCtrl.text, tamanoCtrl.text, llegadaCtrl.text);
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text("Proceso agregado correctamente")),
@@ -114,7 +127,7 @@ class BotonesAccion extends StatelessWidget {
               }
               
               // Llamar a eliminar (la validación de existencia está en main)
-              onEliminar(nombreCtrl.text, salidaCtrl.text);
+              widget.onEliminar(nombreCtrl.text, salidaCtrl.text);
               Navigator.pop(context);
             },
             child: const Text("Confirmar"),
@@ -129,6 +142,31 @@ class BotonesAccion extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+
+        //RadioButtons para la opcion de AJUSTE 
+        RadioListTile<Opciones>(
+          title: const Text('Primer Ajuste'),
+          value: Opciones.primerAjuste,
+          groupValue: _seleccion,
+          onChanged: (Opciones? value) {
+            setState(() {
+              _seleccion = value!;
+            });
+            widget.onCambioOpcion(_seleccion!);
+          },
+        ),
+        RadioListTile<Opciones>(
+          title: const Text('Mejor Ajuste'),
+          value: Opciones.mejorAjuste,
+          groupValue: _seleccion,
+          onChanged: (Opciones? value) {
+            setState(() {
+              _seleccion = value!;
+            });
+            widget.onCambioOpcion(_seleccion!);
+          },
+        ),
+        const SizedBox(height: 20),
         
         // Botón LLEGADA (Agregar)
         ElevatedButton.icon(
