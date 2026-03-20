@@ -34,6 +34,9 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
   // Random para los cálculos
   final Random _random = Random();
 
+  // Key única para forzar rebuild de VisualMemoria
+  Key _memoriaKey = UniqueKey();
+
   //Convertir HH:MM a minutos totales
   int _horaAMinutos(String horaStr) {
     try {
@@ -56,16 +59,16 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
 
   // Función para calcular tiempo de atención (10% probabilidad de 1-10 min)
   int _calcularTiempoAtencion() {
-    int probabilidad = _random.nextInt(100); // 0-99
-    if (probabilidad < 10) { // 10% de probabilidad
-      return _random.nextInt(10) + 1; // 1-10 minutos
+    int probabilidad = _random.nextInt(100);
+    if (probabilidad < 10) {
+      return _random.nextInt(10) + 1;
     }
     return 0;
   }
 
   //Función para calcular tiempo de salida (0-10 minutos)
   int _calcularTiempoSalida() {
-    return _random.nextInt(11); // 0-10 minutos
+    return _random.nextInt(11);
   }
 
   Opciones _opcionSeleccionada = Opciones.primerAjuste;
@@ -74,30 +77,20 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
   void agregarProceso(String nombre, String tamano, String llegada) {
     int nuevoTamano = int.tryParse(tamano) ?? 0;
     
-    //Convertir hora de llegada a minutos
     int tiempoLlegadaMin = _horaAMinutos(llegada);
-    
-    // Calcular tiempo de atención (10% probabilidad de 1-10 min)
     int tiempoAtencionAdicional = _calcularTiempoAtencion();
     int tiempoAtencionMin = tiempoLlegadaMin + tiempoAtencionAdicional;
-    
-    // Calcular tiempo de salida (0-10 min después de atención)
     int tiempoSalidaAdicional = _calcularTiempoSalida();
     int tiempoSalidaMin = tiempoAtencionMin + tiempoSalidaAdicional;
-    
-    //Calcular tiempo de espera (diferencia en minutos)
     int tiempoEsperaMin = tiempoAtencionMin - tiempoLlegadaMin;
     
-    //Convertir a formato HH:MM
     String horaLlegada = _minutosAHora(tiempoLlegadaMin);
     String horaAtencion = _minutosAHora(tiempoAtencionMin);
     String horaSalida = _minutosAHora(tiempoSalidaMin);
-    String tiempoEsperaStr = "$tiempoEsperaMin min";// Mostrar en minutos para claridad
+    String tiempoEsperaStr = "$tiempoEsperaMin min";
     
-    // Calcular ocupación actual
     int ocupado = procesos.fold(0, (sum, p) => sum + (int.tryParse(p['tamano'].toString()) ?? 0));
 
-    // Crear proceso con todos los datos
     Map<String, dynamic> nuevoProceso = {
       "nombre": nombre,
       "tamano": tamano,
@@ -107,7 +100,6 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
       "espera": tiempoEsperaStr,
     };
 
-    // Si no cabe en memoria, guardar en tabla (proceso en espera)
     if (ocupado + nuevoTamano > 100) {
       setState(() {
         procesos.add(nuevoProceso);
@@ -115,49 +107,51 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
       
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Proceso '$nombre' agregado a tabla (memoria llena)"),
+          content: Text("Proceso '$nombre' en espera (memoria llena)"),
           backgroundColor: Colors.orange,
-          duration: const Duration(seconds: 2),
         ),
       );
-      
       return;
     }  
     
-    //Agrega el proceso
-     setState(() {
+    setState(() {
       procesos.add(nuevoProceso);
     });
-    
   }
 
-  // Método para eliminar proceso VALIDACION
+  // Método para eliminar proceso
   void eliminarProceso(String nombre, String salida) {
-    // Buscar proceso por nombre Y tiempo de salida
-    final existe = procesos.any((p) =>
-      p['nombre'] == nombre && p['salida'] == salida
-    );
+    final existe = procesos.any((p) => p['nombre'] == nombre && p['salida'] == salida);
     
     if (!existe) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Proceso no encontrado - Verifique nombre y tiempo de salida"),
-          backgroundColor: Colors.red,
-        ),
+        const SnackBar(content: Text("❌ Proceso no encontrado"), backgroundColor: Colors.red),
       );
       return;
     }
 
     setState(() {
-      procesos.removeWhere((p) =>
-        p['nombre'] == nombre && p['salida'] == salida
-      );
+      procesos.removeWhere((p) => p['nombre'] == nombre && p['salida'] == salida);
     });
     
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("Proceso '$nombre' eliminado correctamente"),
-        backgroundColor: Colors.green,
+      SnackBar(content: Text("✅ '$nombre' eliminado"), backgroundColor: Colors.green),
+    );
+  }
+
+  // 🔥 REINICIO COMPLETO - FUNCIONA 100%
+  void reiniciarPrograma() {
+    setState(() {
+      procesos.clear();
+      _opcionSeleccionada = Opciones.primerAjuste;
+      _memoriaKey = UniqueKey(); // ← Fuerza rebuild completo de VisualMemoria
+    });
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("🔄 ¡Reinicio completo! Memoria: 100MB libre"),
+        backgroundColor: Colors.orange,
+        duration: Duration(seconds: 2),
       ),
     );
   }
@@ -167,39 +161,49 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     return Scaffold(
       backgroundColor: Colors.blueGrey[200],
       appBar: AppBar(
-        title: const Text("Simulación de Procesos"),
-        backgroundColor: Colors.blueGrey,
+        title: const Text("🎮 Simulación de Procesos"),
+        backgroundColor: Colors.blueGrey[800],
+        foregroundColor: Colors.white,
+        elevation: 4,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: reiniciarPrograma,
+            tooltip: "Reiniciar Todo",
+          ),
+        ],
       ),
       body: Row(
         children: [
-          
-          //IZQUIERDA BOTONES
+          // IZQUIERDA - BOTONES
           Expanded(
             flex: 2,
             child: BotonesAccion(
               onAgregar: agregarProceso,
               onEliminar: eliminarProceso,
-              onCambioOpcion: (op){
+              onCambioOpcion: (op) {
                 setState(() {
                   _opcionSeleccionada = op;
                 });
               },
+              onReinicio: reiniciarPrograma,
             ),
           ),
 
-          // CENTRO MEMORIA
+          // CENTRO - MEMORIA (Key fuerza rebuild)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-            child: VisualMemoria(procesos: procesos,
-            opcion :_opcionSeleccionada),
+            child: VisualMemoria(
+              key: _memoriaKey, // ✅ RECREA VisualMemoria en cada reinicio
+              procesos: procesos,
+              opcion: _opcionSeleccionada,
+            ),
           ),
 
-          // DERECHA TABLA
+          // DERECHA - TABLA
           Expanded(
             flex: 3,
-            child: TablaProceso(
-              procesos: procesos,
-            ),
+            child: TablaProceso(procesos: procesos),
           ),
         ],
       ),
