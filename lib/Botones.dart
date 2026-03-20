@@ -19,7 +19,7 @@ class BotonesAccion extends StatefulWidget {
   @override
   State<BotonesAccion> createState() => _BotonesAccionState();
 
-  // 🎨 DIALOGO AGREGAR - TAMAÑO REDUCIDO
+  //  DIALOGO AGREGAR - TAMAÑO REDUCIDO
   static void mostrarDialogoAgregar(
     BuildContext context,
     Function(String, String, String) onAgregar,
