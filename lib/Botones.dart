@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 enum Opciones { primerAjuste, mejorAjuste }
 
 class BotonesAccion extends StatefulWidget {
-  final Function(String, String, String) onAgregar;
+  final Function(String, String, String, String) onAgregar; // ← AGREGADO 'duracion'
   final Function(String, String) onEliminar;
   final Function(Opciones) onCambioOpcion;
   final VoidCallback onReinicio;
@@ -19,13 +19,14 @@ class BotonesAccion extends StatefulWidget {
   @override
   State<BotonesAccion> createState() => _BotonesAccionState();
 
-  //  DIALOGO AGREGAR - TAMAÑO REDUCIDO
+  //  DIALOGO AGREGAR - CON DURACION ENTRE TAMAÑO Y LLEGADA
   static void mostrarDialogoAgregar(
     BuildContext context,
-    Function(String, String, String) onAgregar,
+    Function(String, String, String, String) onAgregar, // ← AGREGADO 'duracion'
   ) {
     final nombreCtrl = TextEditingController();
     final tamanoCtrl = TextEditingController();
+    final duracionCtrl = TextEditingController(); // ← NUEVO CAMPO
     final llegadaCtrl = TextEditingController();
 
     showDialog(
@@ -33,7 +34,7 @@ class BotonesAccion extends StatefulWidget {
       builder: (context) => Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Container(
-          width: 380, // ← TAMAÑO FIJO COMPACTO
+          width: 420, // ← ANCHO AUMENTADO para 4 campos
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -64,10 +65,13 @@ class BotonesAccion extends StatefulWidget {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
-              // Campos más compactos
+              // Campos en orden: Nombre → Tamaño → DURACION → Llegada
               _campoTextoCompacto(nombreCtrl, "Nombre", Icons.person),
               const SizedBox(height: 12),
               _campoTextoCompacto(tamanoCtrl, "Tamaño (MB)", Icons.storage, keyboardType: TextInputType.number),
+              const SizedBox(height: 12),
+              // ← NUEVO CAMPO DURACION (entre Tamaño y Llegada)
+              _campoTextoCompacto(duracionCtrl, "Duración (min)", Icons.timer, keyboardType: TextInputType.number),
               const SizedBox(height: 12),
               _campoTextoCompacto(llegadaCtrl, "Llegada (HH:MM)", Icons.access_time),
               const SizedBox(height: 20),
@@ -91,13 +95,14 @@ class BotonesAccion extends StatefulWidget {
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        if (nombreCtrl.text.isEmpty) {
+                        if (nombreCtrl.text.isEmpty || tamanoCtrl.text.isEmpty || duracionCtrl.text.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text(" Nombre requerido")),
+                            const SnackBar(content: Text("Complete todos los campos")),
                           );
                           return;
                         }
-                        onAgregar(nombreCtrl.text, tamanoCtrl.text, llegadaCtrl.text);
+                        // ← AGREGADO 'duracionCtrl.text'
+                        onAgregar(nombreCtrl.text, tamanoCtrl.text, duracionCtrl.text, llegadaCtrl.text);
                         Navigator.pop(context);
                       },
                       icon: const Icon(Icons.save, size: 18),
@@ -118,7 +123,8 @@ class BotonesAccion extends StatefulWidget {
       ),
     );
   }
-  //  DIALOGO ELIMINAR - TAMAÑO REDUCIDO
+
+  //  DIALOGO ELIMINAR - SIN CAMBIOS
   static void mostrarDialogoEliminar(
     BuildContext context,
     Function(String, String) onEliminar,
@@ -131,7 +137,7 @@ class BotonesAccion extends StatefulWidget {
       builder: (context) => Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Container(
-          width: 380, // ← TAMAÑO FIJO COMPACTO
+          width: 380,
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -147,7 +153,6 @@ class BotonesAccion extends StatefulWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Icono más pequeño
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -162,12 +167,10 @@ class BotonesAccion extends StatefulWidget {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
-              // Campos más compactos
               _campoTextoCompacto(nombreCtrl, "Nombre", Icons.person),
               const SizedBox(height: 12),
               _campoTextoCompacto(salidaCtrl, "Salida (HH:MM)", Icons.schedule),
               const SizedBox(height: 20),
-              // Botones más pequeños
               Row(
                 children: [
                   Expanded(
@@ -189,7 +192,7 @@ class BotonesAccion extends StatefulWidget {
                       onPressed: () {
                         if (nombreCtrl.text.isEmpty || salidaCtrl.text.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text(" Complete campos")),
+                            const SnackBar(content: Text("Complete campos")),
                           );
                           return;
                         }
@@ -215,7 +218,7 @@ class BotonesAccion extends StatefulWidget {
     );
   }
 
-  //  CAMPO TEXTO COMPACTO
+  //  CAMPO TEXTO COMPACTO - SIN CAMBIOS
   static Widget _campoTextoCompacto(
     TextEditingController controller,
     String label,
@@ -226,7 +229,7 @@ class BotonesAccion extends StatefulWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        boxShadow: [BoxShadow(color: Colors.black, blurRadius: 3)],
+        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 3)],
       ),
       child: TextField(
         controller: controller,
@@ -264,7 +267,7 @@ class _BotonesAccionState extends State<BotonesAccion> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          //  ALGORITMO DE ASIGNACIÓN
+          //  ALGORITMO DE ASIGNACIÓN - SIN CAMBIOS
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
@@ -287,7 +290,7 @@ class _BotonesAccionState extends State<BotonesAccion> {
           
           const SizedBox(height: 32),
 
-          //  BOTONES COMPACTOS
+          //  BOTONES COMPACTOS - SIN CAMBIOS
           Column(
             children: [
               _botonPrincipal(Icons.add_circle_outline, "Llegada", Colors.green,
@@ -304,6 +307,7 @@ class _BotonesAccionState extends State<BotonesAccion> {
     );
   }
 
+  // MÉTODOS AUXILIARES - SIN CAMBIOS
   Widget _radioButton(Opciones value, String label, IconData icon) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
@@ -330,7 +334,7 @@ class _BotonesAccionState extends State<BotonesAccion> {
   Widget _botonPrincipal(IconData icon, String label, Color color, VoidCallback onPressed) {
     return SizedBox(
       width: double.infinity,
-      height: 65, // ← ALTURA REDUCIDA
+      height: 65,
       child: ElevatedButton.icon(
         onPressed: onPressed,
         icon: Icon(icon, size: 26),

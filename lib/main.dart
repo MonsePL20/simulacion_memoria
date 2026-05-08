@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'TablaProcesosApp.dart';
+import 'TablaProcesosApp.dart';  // ← CAMBIAR por 'tabla_procesos.dart'
 import 'Botones.dart';
-import 'PilaProcesos.dart';
+import 'PilaProcesos.dart';     // ← CAMBIAR por 'pila_procesos.dart'
 import 'dart:math';
+
+enum Opciones { primerAjuste, mejorAjuste } // ← AGREGADO
 
 void main() {
   runApp(const MainApp());
@@ -28,16 +30,17 @@ class PantallaPrincipal extends StatefulWidget {
 
 class _PantallaPrincipalState extends State<PantallaPrincipal> {
   
-  //Lista única y centralizada de procesos
-  final List<Map<String, dynamic>> procesos = [];
+  // ✅ LISTA DE REGISTRO HISTÓRICO (NO se limpia nunca)
+  final List<Map<String, dynamic>> historialProcesos = [];
   
-  // Random para los cálculos
+  // Lista solo para memoria activa (se sincroniza con VisualMemoria)
+  final List<Map<String, dynamic>> procesosActivos = [];
+  
   final Random _random = Random();
-
-  // Key única para forzar la reconstrcuccion de VisualMemoria
   Key _memoriaKey = UniqueKey();
+  Opciones _opcionSeleccionada = Opciones.primerAjuste;
 
-  //Convertir HH:MM a minutos totales
+  //Convertir HH:MM → minutos
   int _horaAMinutos(String horaStr) {
     try {
       if (!horaStr.contains(':')) return 0;
@@ -50,106 +53,109 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     }
   }
 
-  // Convertir minutos totales a HH:MM
+  // minutos → HH:MM
   String _minutosAHora(int minutosTotales) {
     int horas = minutosTotales ~/ 60;
     int minutos = minutosTotales % 60;
-    return "$horas:${minutos.toString().padLeft(2, '0')}";
+    return "${horas.toString().padLeft(2, '0')}:${minutos.toString().padLeft(2, '0')}";
   }
 
-  // Función para calcular tiempo de atención (10% probabilidad de 1-10 min)
-  int _calcularTiempoAtencion() {
-    int probabilidad = _random.nextInt(100);
-    if (probabilidad < 10) {
-      return _random.nextInt(10) + 1;
-    }
-    return 0;
-  }
-
-  //Función para calcular tiempo de salida (0-10 minutos)
-  int _calcularTiempoSalida() {
-    return _random.nextInt(11);
-  }
-
-  Opciones _opcionSeleccionada = Opciones.primerAjuste;
-
-  //Método para agregar proceso
-  void agregarProceso(String nombre, String tamano, String llegada) {
-    int nuevoTamano = int.tryParse(tamano) ?? 0; 
+  // ✅ AGREGAR PROCESO (CORREGIDO con 4 parámetros + HISTORIAL)
+  void agregarProceso(String nombre, String tamano, String duracion, String llegada) {
+    int nuevoTamano = int.tryParse(tamano) ?? 0;
+    int duracionMin = int.tryParse(duracion) ?? 0; // ← ✅ USA DURACION
     
     int tiempoLlegadaMin = _horaAMinutos(llegada);
-    int tiempoAtencionAdicional = _calcularTiempoAtencion();
-    int tiempoAtencionMin = tiempoLlegadaMin + tiempoAtencionAdicional;
+    int tiempoAtencionMin = tiempoLlegadaMin + duracionMin; // ← CÁLCULO CON DURACIÓN
     int tiempoSalidaAdicional = _calcularTiempoSalida();
     int tiempoSalidaMin = tiempoAtencionMin + tiempoSalidaAdicional;
-    int tiempoEsperaMin = tiempoAtencionMin - tiempoLlegadaMin;
+    int tiempoEsperaMin = duracionMin; // ← TIEMPO ESPERA = DURACIÓN
     
-    String horaLlegada = _minutosAHora(tiempoLlegadaMin);
+    String horaLlegada = llegada; // ← MANTIENE FORMATO ORIGINAL
     String horaAtencion = _minutosAHora(tiempoAtencionMin);
     String horaSalida = _minutosAHora(tiempoSalidaMin);
-    String tiempoEsperaStr = "$tiempoEsperaMin min";
-    
-    int ocupado = procesos.fold(0, (sum, p) => sum + (int.tryParse(p['tamano'].toString()) ?? 0));// Memoria ocupada actual
+    String tiempoEsperaStr = "${tiempoEsperaMin} min";
 
-    Map<String, dynamic> nuevoProceso = {
+    // ✅ CREAR PROCESO COMPLETO
+    Map<String, dynamic> procesoCompleto = {
       "nombre": nombre,
       "tamano": tamano,
+      "duracion": duracion,  // ← ✅ NUEVO CAMPO
       "llegada": horaLlegada,
       "atencion": horaAtencion,
       "salida": horaSalida,
       "espera": tiempoEsperaStr,
+      "estado": "Activo",    // ← NUEVO: seguimiento estado
     };
 
-    if (ocupado + nuevoTamano > 100) {
+    // Verificar memoria disponible
+    int memoriaOcupada = procesosActivos.fold(0, (sum, p) => sum + (int.tryParse(p['tamano'].toString()) ?? 0));
+    
+    if (memoriaOcupada + nuevoTamano > 100) {
       setState(() {
-        procesos.add(nuevoProceso);
+        // ✅ AGREGAR A HISTORIAL (PERMANENTE)
+        historialProcesos.add({...procesoCompleto, "estado": "En Espera"});
       });
-      
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Proceso '$nombre' en espera (memoria llena)"),
-          backgroundColor: Colors.orange,
-        ),
+        SnackBar(content: Text("❌ '$nombre' en espera (memoria llena)"), backgroundColor: Colors.orange),
       );
       return;
-    }  
-    
+    }
+
+    // ✅ AGREGAR A AMBAS LISTAS
     setState(() {
-      procesos.add(nuevoProceso);
+      historialProcesos.add(procesoCompleto);      // ← REGISTRO PERMANENTE
+      procesosActivos.add(procesoCompleto);        // ← MEMORIA ACTIVA
     });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("✅ '$nombre' agregado a memoria"), backgroundColor: Colors.green),
+    );
   }
 
-  // Método para eliminar proceso
+  // ✅ ELIMINAR (solo de memoria activa, queda en historial)
   void eliminarProceso(String nombre, String salida) {
-    final existe = procesos.any((p) => p['nombre'] == nombre && p['salida'] == salida);
+    final procesoActivo = procesosActivos.firstWhere(
+      (p) => p['nombre'] == nombre && p['salida'] == salida,
+      orElse: () => {},
+    );
     
-    if (!existe) {
+    if (procesoActivo.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(" Proceso no encontrado"), backgroundColor: Colors.red), 
+        const SnackBar(content: Text("❌ Proceso no encontrado en memoria"), backgroundColor: Colors.red),
       );
       return;
     }
 
     setState(() {
-      procesos.removeWhere((p) => p['nombre'] == nombre && p['salida'] == salida);
+      // ✅ CAMBIAR ESTADO en historial
+      final indexHistorial = historialProcesos.indexWhere((p) => p['nombre'] == nombre && p['salida'] == salida);
+      if (indexHistorial != -1) {
+        historialProcesos[indexHistorial]['estado'] = 'Eliminado';
+      }
+      
+      // ✅ REMOVER solo de activos
+      procesosActivos.removeWhere((p) => p['nombre'] == nombre && p['salida'] == salida);
     });
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(" '$nombre' eliminado"), backgroundColor: Colors.green),
+      SnackBar(content: Text("🗑️ '$nombre' eliminado de memoria"), backgroundColor: Colors.red),
     );
   }
 
-  //  REINICIO COMPLETO - FUNCIONA 100%
+  int _calcularTiempoSalida() => _random.nextInt(11);
+
+  // ✅ REINICIO (limpia solo activos, historial queda)
   void reiniciarPrograma() {
     setState(() {
-      procesos.clear();
+      procesosActivos.clear();
       _opcionSeleccionada = Opciones.primerAjuste;
-      _memoriaKey = UniqueKey(); // Fuerza rebuild completo de VisualMemoria
+      _memoriaKey = UniqueKey();
     });
     
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text(" ¡Reinicio completo! Memoria: 100MB libre"),
+        content: Text("🔄 Memoria reiniciada (Historial preservado)"),
         backgroundColor: Colors.orange,
         duration: Duration(seconds: 2),
       ),
@@ -161,7 +167,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     return Scaffold(
       backgroundColor: Colors.blueGrey[200],
       appBar: AppBar(
-        title: const Text(" Simulación de Procesos"),
+        title: const Text("📊 Simulación de Procesos y Memoria"),
         backgroundColor: Colors.blueGrey[800],
         foregroundColor: Colors.white,
         elevation: 4,
@@ -169,41 +175,48 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: reiniciarPrograma,
-            tooltip: "Reiniciar Todo",
+            tooltip: "Reiniciar Memoria",
           ),
         ],
       ),
       body: Row(
         children: [
-          // IZQUIERDA - BOTONES
-          Expanded(
-            flex: 2,
-            child: BotonesAccion(
-              onAgregar: agregarProceso,
-              onEliminar: eliminarProceso,
-              onCambioOpcion: (op) {
-                setState(() {
-                  _opcionSeleccionada = op;
-                });
-              },
-              onReinicio: reiniciarPrograma,
-            ),
-          ),
+          // 🎛️ BOTONES
+          Expanded(flex: 2, child: BotonesAccion(
+            onAgregar: agregarProceso,
+            onEliminar: eliminarProceso,
+            onCambioOpcion: (op) => setState(() => _opcionSeleccionada = op),
+            onReinicio: reiniciarPrograma,
+          )),
 
-          // CENTRO - MEMORIA (Key fuerza rebuild)
+          // 🧠 MEMORIA (solo procesosActivos)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
             child: VisualMemoria(
-              key: _memoriaKey, // RECREA VisualMemoria en cada reinicio
-              procesos: procesos,
+              key: _memoriaKey,
+              procesos: procesosActivos,  // ← SOLO ACTIVOS
               opcion: _opcionSeleccionada,
             ),
           ),
 
-          // DERECHA - TABLA
+          // 📋 TABLA HISTÓRICA (todos los procesos)
           Expanded(
             flex: 3,
-            child: TablaProceso(procesos: procesos),
+            child: Column(
+              children: [
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  color: Colors.blue[700],
+                  child: const Text(
+                    "📋 HISTORIAL COMPLETO DE PROCESOS",
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                Expanded(child: TablaProceso(procesos: historialProcesos)), // ← HISTORIAL
+              ],
+            ),
           ),
         ],
       ),
