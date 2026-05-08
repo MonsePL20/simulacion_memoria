@@ -43,7 +43,7 @@ class TablaProceso extends StatelessWidget {
                     headingRowHeight: 50,
                     dataRowMinHeight: 40,
                     dataRowMaxHeight: 50,
-                    columnSpacing: 15, // ← REDUCIDO para 8 columnas
+                    columnSpacing: 15, // ← REDUCIDO para 8 columnas 
                     horizontalMargin: 10,
                     border: TableBorder.all(color: Colors.grey),
                     headingRowColor: WidgetStateProperty.all(Colors.grey[300]),
