@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class TablaProceso extends StatelessWidget {
-  
   final List<Map<String, dynamic>> procesos;
 
   const TablaProceso({
@@ -18,7 +17,6 @@ class TablaProceso extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         child: Column(
           children: [
-
             // TITULO
             Container(
               width: double.infinity,
@@ -26,7 +24,7 @@ class TablaProceso extends StatelessWidget {
               color: Colors.blueGrey[200],
               child: const Center(
                 child: Text(
-                  "TABLA DE PROCESOS",
+                  "📋 TABLA DE PROCESOS",
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -34,10 +32,8 @@ class TablaProceso extends StatelessWidget {
                 ),
               ),
             ),
-
             const SizedBox(height: 10),
-
-            // TABLA CON SCROLL
+            // TABLA CON 8 COLUMNAS (AGREGADA ESTADO)
             Expanded(
               child: SingleChildScrollView(
                 scrollDirection: Axis.vertical,
@@ -47,102 +43,63 @@ class TablaProceso extends StatelessWidget {
                     headingRowHeight: 50,
                     dataRowMinHeight: 40,
                     dataRowMaxHeight: 50,
-                    columnSpacing: 20,
-                    horizontalMargin: 15,
+                    columnSpacing: 15, // ← REDUCIDO para 8 columnas
+                    horizontalMargin: 10,
                     border: TableBorder.all(color: Colors.grey),
                     headingRowColor: WidgetStateProperty.all(Colors.grey[300]),
                     columns: const [
-                      // 1. Nombre Proceso
-                      DataColumn(
-                        label: Text("Nombre Proceso", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
-                      ),
-                      // 2. Tamaño
-                      DataColumn(
-                        label: Text("Tamaño", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
-                      ),
-                      // 3. duracion Tiempo
-                      DataColumn(
-                        label: Text("Duracion Tiempo", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
-                      ),
-                      // 4. Tiempo Llegada
-                      DataColumn(
-                        label: Text("Tiempo Llegada", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
-                      ),
-                      // 5. Tiempo Atención
-                      DataColumn(
-                        label: Text("Tiempo Atención", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
-                      ),
-                      // 6. Tiempo Salida
-                      DataColumn(
-                        label: Text("Tiempo Salida", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
-                      ),
-                      // 7. Tiempo Espera
-                      DataColumn(
-                        label: Text("Tiempo Espera", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
-                      ),
+                      DataColumn(label: Text("Nombre", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15))),
+                      DataColumn(label: Text("Tamaño", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15))),
+                      DataColumn(label: Text("Duración", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15))),
+                      DataColumn(label: Text("Llegada", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15))),
+                      DataColumn(label: Text("Atención", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15))),
+                      DataColumn(label: Text("Salida", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15))),
+                      DataColumn(label: Text("Espera", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15))),
+                      DataColumn(label: Text("Estado", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15))), // ← NUEVA
                     ],
                     rows: procesos.isEmpty
-                        ? [
-                            const DataRow(cells: [
-                              DataCell(Text("-", textAlign: TextAlign.center)),
-                              DataCell(Text("-", textAlign: TextAlign.center)),
-                              DataCell(Text("-", textAlign: TextAlign.center)),
-                              DataCell(Text("-", textAlign: TextAlign.center)),
-                              DataCell(Text("-", textAlign: TextAlign.center)),
-                              DataCell(Text("-", textAlign: TextAlign.center)),
-                              DataCell(Text("-", textAlign: TextAlign.center)),
-                            ])
-                          ]
+                        ? [const DataRow(cells: [
+                            DataCell(Text("-", textAlign: TextAlign.center)),
+                            DataCell(Text("-", textAlign: TextAlign.center)),
+                            DataCell(Text("-", textAlign: TextAlign.center)),
+                            DataCell(Text("-", textAlign: TextAlign.center)),
+                            DataCell(Text("-", textAlign: TextAlign.center)),
+                            DataCell(Text("-", textAlign: TextAlign.center)),
+                            DataCell(Text("-", textAlign: TextAlign.center)),
+                            DataCell(Text("-", textAlign: TextAlign.center)), // ← NUEVA
+                          ])]
                         : procesos.map((p) {
                             return DataRow(
                               cells: [
-                                // 1. Nombre Proceso
-                                DataCell(
+                                DataCell(SizedBox(width: 70, child: Text(p["nombre"] ?? "-", overflow: TextOverflow.ellipsis))),
+                                DataCell(SizedBox(width: 60, child: Text("${p["tamano"]} MB", textAlign: TextAlign.center))),
+                                DataCell(SizedBox(width: 70, child: Text(p["duracion"] ?? "-", textAlign: TextAlign.center))),
+                                DataCell(SizedBox(width: 70, child: Text(p["llegada"] ?? "-", textAlign: TextAlign.center))),
+                                DataCell(SizedBox(width: 70, child: Text(p["atencion"] ?? "-", textAlign: TextAlign.center))),
+                                DataCell(SizedBox(width: 70, child: Text(p["salida"] ?? "-", textAlign: TextAlign.center))),
+                                DataCell(SizedBox(width: 70, child: Text(p["espera"] ?? "-", textAlign: TextAlign.center))),
+                                DataCell( // ← NUEVA COLUMNA ESTADO
                                   SizedBox(
-                                    width: 90,
-                                    child: Text(p["nombre"] ?? "-", overflow: TextOverflow.ellipsis),
-                                  ),
-                                ),
-                                // 2. Tamaño
-                                DataCell(
-                                  SizedBox(
-                                    width: 70,
-                                    child: Text("${p["tamano"]} MB", textAlign: TextAlign.center),
-                                  ),
-                                ),
-                                // 3. duracion Tiempo
-                                DataCell(
-                                  SizedBox(
-                                    width: 90,
-                                    child: Text(p["duracion"] ?? "-", textAlign: TextAlign.center),
-                                  ),
-                                ),
-                                // 4. Tiempo Llegada
-                                DataCell(
-                                  SizedBox(
-                                    width: 90,
-                                    child: Text(p["llegada"] ?? "-", textAlign: TextAlign.center),
-                                  ),
-                                ),
-                                // 5. Tiempo Atención
-                                DataCell(
-                                  SizedBox(
-                                    width: 90,
-                                    child: Text(p["atencion"] ?? "-", textAlign: TextAlign.center),
-                                  ),
-                                ),
-                                // 6. Tiempo Salida
-                                DataCell(
-                                  SizedBox(
-                                    width: 90,
-                                    child: Text(p["salida"] ?? "-", textAlign: TextAlign.center),
-                                  ),
-                                ),
-                                // 7. Tiempo Espera
-                                DataCell(
-                                  SizedBox(
-                                    width: 90,
-                                    child: Text(p["espera"] ?? "-", textAlign: TextAlign.center),
+                                    width: 80,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: p["estado"] == "Activo" ? Colors.green[100] :
+                                               p["estado"] == "Eliminado" ? Colors.red[100] :
+                                               Colors.orange[100],
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Text(
+                                        p["estado"] ?? "-",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: p["estado"] == "Activo" ? Colors.green[800] :
+                                                 p["estado"] == "Eliminado" ? Colors.red[800] :
+                                                 Colors.orange[800],
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],
