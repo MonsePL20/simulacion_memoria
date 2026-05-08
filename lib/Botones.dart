@@ -93,7 +93,7 @@ class BotonesAccion extends StatefulWidget {
                       onPressed: () {
                         if (nombreCtrl.text.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text("❌ Nombre requerido")),
+                            const SnackBar(content: Text(" Nombre requerido")),
                           );
                           return;
                         }
@@ -118,8 +118,7 @@ class BotonesAccion extends StatefulWidget {
       ),
     );
   }
-
-  // 🎨 DIALOGO ELIMINAR - TAMAÑO REDUCIDO
+  //  DIALOGO ELIMINAR - TAMAÑO REDUCIDO
   static void mostrarDialogoEliminar(
     BuildContext context,
     Function(String, String) onEliminar,
@@ -190,7 +189,7 @@ class BotonesAccion extends StatefulWidget {
                       onPressed: () {
                         if (nombreCtrl.text.isEmpty || salidaCtrl.text.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text("❌ Complete campos")),
+                            const SnackBar(content: Text(" Complete campos")),
                           );
                           return;
                         }
@@ -216,7 +215,7 @@ class BotonesAccion extends StatefulWidget {
     );
   }
 
-  // 🎨 CAMPO TEXTO COMPACTO
+  //  CAMPO TEXTO COMPACTO
   static Widget _campoTextoCompacto(
     TextEditingController controller,
     String label,
@@ -265,7 +264,7 @@ class _BotonesAccionState extends State<BotonesAccion> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          // ✨ ALGORITMO DE ASIGNACIÓN
+          //  ALGORITMO DE ASIGNACIÓN
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
@@ -288,7 +287,7 @@ class _BotonesAccionState extends State<BotonesAccion> {
           
           const SizedBox(height: 32),
 
-          // ✨ BOTONES COMPACTOS
+          //  BOTONES COMPACTOS
           Column(
             children: [
               _botonPrincipal(Icons.add_circle_outline, "Llegada", Colors.green,

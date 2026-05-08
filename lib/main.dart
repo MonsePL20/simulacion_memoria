@@ -34,7 +34,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
   // Random para los cálculos
   final Random _random = Random();
 
-  // Key única para forzar rebuild de VisualMemoria
+  // Key única para forzar la reconstrcuccion de VisualMemoria
   Key _memoriaKey = UniqueKey();
 
   //Convertir HH:MM a minutos totales
@@ -75,7 +75,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
 
   //Método para agregar proceso
   void agregarProceso(String nombre, String tamano, String llegada) {
-    int nuevoTamano = int.tryParse(tamano) ?? 0;
+    int nuevoTamano = int.tryParse(tamano) ?? 0; 
     
     int tiempoLlegadaMin = _horaAMinutos(llegada);
     int tiempoAtencionAdicional = _calcularTiempoAtencion();
@@ -89,7 +89,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     String horaSalida = _minutosAHora(tiempoSalidaMin);
     String tiempoEsperaStr = "$tiempoEsperaMin min";
     
-    int ocupado = procesos.fold(0, (sum, p) => sum + (int.tryParse(p['tamano'].toString()) ?? 0));
+    int ocupado = procesos.fold(0, (sum, p) => sum + (int.tryParse(p['tamano'].toString()) ?? 0));// Memoria ocupada actual
 
     Map<String, dynamic> nuevoProceso = {
       "nombre": nombre,
@@ -125,7 +125,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     
     if (!existe) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("❌ Proceso no encontrado"), backgroundColor: Colors.red),
+        const SnackBar(content: Text(" Proceso no encontrado"), backgroundColor: Colors.red), 
       );
       return;
     }
@@ -135,21 +135,21 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     });
     
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("✅ '$nombre' eliminado"), backgroundColor: Colors.green),
+      SnackBar(content: Text(" '$nombre' eliminado"), backgroundColor: Colors.green),
     );
   }
 
-  // 🔥 REINICIO COMPLETO - FUNCIONA 100%
+  //  REINICIO COMPLETO - FUNCIONA 100%
   void reiniciarPrograma() {
     setState(() {
       procesos.clear();
       _opcionSeleccionada = Opciones.primerAjuste;
-      _memoriaKey = UniqueKey(); // ← Fuerza rebuild completo de VisualMemoria
+      _memoriaKey = UniqueKey(); // Fuerza rebuild completo de VisualMemoria
     });
     
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text("🔄 ¡Reinicio completo! Memoria: 100MB libre"),
+        content: Text(" ¡Reinicio completo! Memoria: 100MB libre"),
         backgroundColor: Colors.orange,
         duration: Duration(seconds: 2),
       ),
@@ -161,7 +161,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     return Scaffold(
       backgroundColor: Colors.blueGrey[200],
       appBar: AppBar(
-        title: const Text("🎮 Simulación de Procesos"),
+        title: const Text(" Simulación de Procesos"),
         backgroundColor: Colors.blueGrey[800],
         foregroundColor: Colors.white,
         elevation: 4,
@@ -194,7 +194,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
             child: VisualMemoria(
-              key: _memoriaKey, // ✅ RECREA VisualMemoria en cada reinicio
+              key: _memoriaKey, // RECREA VisualMemoria en cada reinicio
               procesos: procesos,
               opcion: _opcionSeleccionada,
             ),

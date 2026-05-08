@@ -10,7 +10,7 @@ class TablaProceso extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) { 
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Container(

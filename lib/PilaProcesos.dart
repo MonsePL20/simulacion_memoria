@@ -59,7 +59,7 @@ class _VisualMemoriaState extends State<VisualMemoria> {
       }
     }
 
-    // Colocar procesos en espera/nuevos
+    // Colocar procesos en espera O de nuevos
     for (var p in widget.procesos) {
       bool yaEnMemoria = memoria.any((m) => m["nombre"] == p["nombre"] && !(m["libre"] ?? true));
       if (!yaEnMemoria) {
@@ -143,7 +143,7 @@ class _VisualMemoriaState extends State<VisualMemoria> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text("💾 MEMORIA", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+              const Text("MEMORIA", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(color: colorMemoria, borderRadius: BorderRadius.circular(20)),
@@ -153,7 +153,7 @@ class _VisualMemoriaState extends State<VisualMemoria> {
           ),
         ),
         
-        // 🔥 MEMORIA CON FORMATO EXACTO "P2 / 5MB"
+        // MEMORIA CON FORMATO EXACTO "P2 / 5MB"
         Expanded(
           child: Container(
             width: 420, // ← ANCHO FIJO
@@ -167,7 +167,7 @@ class _VisualMemoriaState extends State<VisualMemoria> {
               borderRadius: BorderRadius.circular(10),
               child: Column(
                 children: memoria.map((bloque) {
-                  // 🎯 FORMATO EXACTO: "P2 / 5MB" o "Libre / 75MB"
+                  // FORMATO EXACTO: "P2 / 5MB" o "Libre / 75MB"
                   String nombreNumero = bloque["libre"] 
                       ? "Libre" 
                       : bloque["nombre"].toString().contains("P") 
@@ -191,7 +191,7 @@ class _VisualMemoriaState extends State<VisualMemoria> {
                         child: FittedBox( // ← AJUSTA TEXTO para bloques pequeños
                           fit: BoxFit.scaleDown,
                           child: Text(
-                            textoCompleto, // ✅ "P2 / 5MB"
+                            textoCompleto, // "P2 / 5MB"
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: bloque["libre"] ? Colors.black87 : Colors.white,
